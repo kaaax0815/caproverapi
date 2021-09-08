@@ -1,17 +1,16 @@
-/* import { assertThrows, assertEquals } from 'https://deno.land/std@0.106.0/testing/asserts.ts';
-import { validateResponse, STATUS, IResult, Obj } from './api.ts';
-import { APIError } from './error.ts'; */
+import { assertEquals } from 'https://deno.land/std@0.106.0/testing/asserts.ts';
+import { STATUS, validateResponse } from './api.ts';
 
 Deno.test('validateResponse', () => {
   // Doesn't work because APIError is 'A non-Error object'
-  /* const templateResponse = (status: STATUS) => {
+  const templateResponse = (status: STATUS) => {
     return {
       data: { status, description: 'Description', data: {} },
       status: 200,
       statusText: 'OK'
     };
   };
-  assertThrows<IResult<Obj>>(
+  /* assertThrows<IResult<Obj>>(
     () => validateResponse(templateResponse(STATUS.AUTHENTICATION_FAILED)),
     APIError
   );
@@ -55,11 +54,11 @@ Deno.test('validateResponse', () => {
     () => validateResponse(templateResponse(STATUS.ILLEGAL_PARAMETER)),
     APIError
   );
-  assertThrows<IResult<Obj>>(() => validateResponse(templateResponse(STATUS.NOT_FOUND)), APIError);
+  assertThrows<IResult<Obj>>(() => validateResponse(templateResponse(STATUS.NOT_FOUND)), APIError); */
   assertEquals(() => validateResponse(templateResponse(STATUS.OK)), {});
   assertEquals(() => validateResponse(templateResponse(STATUS.OK_DEPLOY_STARTED)), {});
   assertEquals(() => validateResponse(templateResponse(STATUS.OK_PARTIALLY)), {});
-  assertThrows<IResult<Obj>>(
+  /* assertThrows<IResult<Obj>>(
     () => validateResponse(templateResponse(STATUS.PASSWORD_BACK_OFF)),
     APIError
   );

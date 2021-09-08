@@ -1,4 +1,4 @@
-import { crypto } from "https://deno.land/std@0.106.0/crypto/mod.ts";
+import { crypto } from 'https://deno.land/std@0.106.0/crypto/mod.ts';
 
 /**
  * Generate random hex string with `bytes` bytes
@@ -7,10 +7,8 @@ import { crypto } from "https://deno.land/std@0.106.0/crypto/mod.ts";
 export function generateRandomHexString(bytes: number): string {
   const byteArray = new Uint8Array(bytes);
   const randomBytes = Array.from(crypto.getRandomValues(byteArray));
-  const hexArray = randomBytes.map((byte) =>
-    ("0" + (byte & 0xff).toString(16)).slice(-2)
-  );
-  return hexArray.join("");
+  const hexArray = randomBytes.map((byte) => ('0' + (byte & 0xff).toString(16)).slice(-2));
+  return hexArray.join('');
 }
 
 /**
@@ -52,13 +50,13 @@ export function includesAll(arr: string[], target: string[]) {
  */
 export function processLog(logs: string) {
   const separators = [
-    "00000000",
-    "01000000",
-    "02000000",
-    "03000000", // This is not in the Docker docs, but can actually happen when the log stream is broken https://github.com/caprover/caprover/issues/366
+    '00000000',
+    '01000000',
+    '02000000',
+    '03000000' // This is not in the Docker docs, but can actually happen when the log stream is broken https://github.com/caprover/caprover/issues/366
   ];
   const logsProcessed = logs
-    .split(new RegExp(separators.join("|"), "g"))
+    .split(new RegExp(separators.join('|'), 'g'))
     .map((rawRow) => {
       let time = 0;
 
@@ -72,24 +70,24 @@ export function processLog(logs: string) {
 
       return {
         text: textUtf8,
-        time: time,
+        time: time
       };
     })
     .sort((a, b) => (a.time > b.time ? 1 : b.time > a.time ? -1 : 0))
     .map((a) => {
       return a.text;
     })
-    .join("")
-    .replace(getAnsiColorRegex(), "");
+    .join('')
+    .replace(getAnsiColorRegex(), '');
   return logsProcessed;
 }
 
 function getAnsiColorRegex() {
   const pattern = [
-    "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\\u0007)",
-    "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))",
-  ].join("|");
-  return new RegExp(pattern, "g");
+    '[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\\u0007)',
+    '(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))'
+  ].join('|');
+  return new RegExp(pattern, 'g');
 }
 
 function convertHexStringToUtf8(raw: string) {
@@ -98,13 +96,13 @@ function convertHexStringToUtf8(raw: string) {
       return decodeURIComponent(
         raw
           .substring(8, raw.length)
-          .replace(/\s+/g, "")
-          .replace(/[0-9a-f]{2}/g, "%$&"),
+          .replace(/\s+/g, '')
+          .replace(/[0-9a-f]{2}/g, '%$&')
       );
     } catch {
-      throw new Error("Your Log has to be HEX encoded");
+      throw new Error('Your Log has to be HEX encoded');
     }
   } else {
-    return "";
+    return '';
   }
 }

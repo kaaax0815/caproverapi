@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from 'https://deno.land/std@0.106.0/testing/asserts.ts';
 
-import { generateRandomHexString, arraysMatch, includesAll, processLog } from './utils.ts';
+import { arraysMatch, generateRandomHexString, includesAll, processLog } from './utils.ts';
 
 Deno.test('generateRandomHexString', () => {
   const hexString32 = generateRandomHexString(32);

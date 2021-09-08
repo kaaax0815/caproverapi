@@ -1,15 +1,11 @@
 // deno-lint-ignore-file no-explicit-any
-import { OSError } from "./error.ts";
-import debug from "https://deno.land/x/debuglog@v1.0.0/debug.ts";
+import { OSError } from './error.ts';
+import debug from 'https://deno.land/x/debuglog@v1.0.0/debug.ts';
 
 export type HandlerFunction = (osError: number[], ctx: any) => void;
 
 export const Catch = (osError: number[]): any => {
-  return (
-    _target: any,
-    _propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) => {
+  return (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) => {
     // Save a reference to the original method
     const originalMethod = descriptor.value;
 
@@ -43,7 +39,7 @@ function _handleError(_ctx: any, osError: number[], error: Error) {
   if (parsedError && osError.includes(parsedError)) {
     throw new OSError(parsedError, error.message);
   } else {
-    debug("@Catch")("Caught error that is not included");
+    debug('@Catch')('Caught error that is not included');
     // Throw error further
     // Next decorator in chain can catch it
     throw error;
@@ -60,7 +56,7 @@ function parseError(error: Error) {
 
 /** Only for Windows */
 export enum WindowsOSErrors {
-  NO_SUCH_HOST_IS_KNOWN = 11001,
+  NO_SUCH_HOST_IS_KNOWN = 11001
 }
 
 /** Only works on Windows */

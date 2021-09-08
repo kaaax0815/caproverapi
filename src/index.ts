@@ -1,13 +1,13 @@
-import axiod from "https://deno.land/x/axiod@0.22/mod.ts";
+import axiod from 'https://deno.land/x/axiod@0.22/mod.ts';
 import {
   parse as YAMLparse,
-  stringify as YAMLstringify,
-} from "https://deno.land/std@0.106.0/encoding/yaml.ts";
+  stringify as YAMLstringify
+} from 'https://deno.land/std@0.106.0/encoding/yaml.ts';
 const YAML = { stringify: YAMLstringify, parse: YAMLparse };
-import debug from "https://deno.land/x/debuglog@v1.0.0/debug.ts";
-import { EventEmitter } from "https://deno.land/x/event_emitter@1.0.0/mod.ts";
-import { processLog } from "./utils.ts";
-import Ask from "https://deno.land/x/ask@1.0.6/mod.ts";
+import debug from 'https://deno.land/x/debuglog@v1.0.0/debug.ts';
+import { EventEmitter } from 'https://deno.land/x/event_emitter@1.0.0/mod.ts';
+import { processLog } from './utils.ts';
+import Ask from 'https://deno.land/x/ask@1.0.6/mod.ts';
 
 import {
   AppCreate,
@@ -23,12 +23,12 @@ import {
   PATHS,
   RepoInfo,
   SystemInfo,
-  validateResponse,
-} from "./api.ts";
+  validateResponse
+} from './api.ts';
 
-import { Catch, ConnectionErrors } from "./network.ts";
+import { Catch, ConnectionErrors } from './network.ts';
 
-import { arraysMatch, generateRandomHexString, includesAll } from "./utils.ts";
+import { arraysMatch, generateRandomHexString, includesAll } from './utils.ts';
 
 class CapRover {
   protected address: string;
@@ -38,7 +38,7 @@ class CapRover {
   token: string;
   protected headers: IHeaders;
   readonly appsPath =
-    "https://raw.githubusercontent.com/caprover/one-click-apps/master/public/v4/apps/";
+    'https://raw.githubusercontent.com/caprover/one-click-apps/master/public/v4/apps/';
 
   protected constructor(constructor: IContructor) {
     this.address = constructor.address;
@@ -47,19 +47,19 @@ class CapRover {
     this.namespace = constructor.namespace;
     this.token = constructor.token;
     this.headers = constructor.headers;
-    debug("constructor")("Created new CapRover Instance");
+    debug('constructor')('Created new CapRover Instance');
   }
 
   /**
    * Build the right Headers for the API
    */
   protected buildHeaders(): IHeaders {
-    debug("buildHeaders")("Built Headers");
+    debug('buildHeaders')('Built Headers');
     return {
-      "content-type": "application/json;charset=UTF-8",
-      accept: "application/json, text/plain, */*",
-      "x-namespace": this.namespace,
-      "x-captain-auth": this.token,
+      'content-type': 'application/json;charset=UTF-8',
+      accept: 'application/json, text/plain, */*',
+      'x-namespace': this.namespace,
+      'x-captain-auth': this.token
     };
   }
 
@@ -69,7 +69,7 @@ class CapRover {
    * @returns Full URL
    */
   protected buildURL(endpoint: PATHS): string {
-    debug("buildURL")("Built URL for Endpoint", endpoint);
+    debug('buildURL')('Built URL for Endpoint', endpoint);
     return `${this.protocol}${this.address}/api/v2${endpoint}`;
   }
 
@@ -80,7 +80,7 @@ class CapRover {
    * @returns Full URL
    */
   protected static buildURL(endpoint: PATHS, opts: Full<ICreate>): string {
-    debug("static:buildURL")("Built URL for Endpoint", endpoint);
+    debug('static:buildURL')('Built URL for Endpoint', endpoint);
     return `${opts.protocol}${opts.address}/api/v2${endpoint}`;
   }
 
@@ -89,16 +89,14 @@ class CapRover {
    * @param opts The Options
    * @returns The Token
    */
-  protected static async getToken(
-    opts: Omit<Full<IContructor>, "token">,
-  ): Promise<string> {
+  protected static async getToken(opts: Omit<Full<IContructor>, 'token'>): Promise<string> {
     const result = await axiod.post(
       CapRover.buildURL(PATHS.LOGIN, opts),
       { password: opts.password },
-      { headers: opts.headers },
+      { headers: opts.headers }
     );
     const data = validateResponse(result);
-    debug("getToken")("Got Token");
+    debug('getToken')('Got Token');
     return data.data.token;
   }
 
@@ -108,10 +106,10 @@ class CapRover {
    */
   async getSystemInfo() {
     const result = await axiod.get(this.buildURL(PATHS.SYSTEM_INFO), {
-      headers: this.headers,
+      headers: this.headers
     });
     const data = validateResponse<SystemInfo>(result);
-    debug("getSystemInfo")("Got System Info");
+    debug('getSystemInfo')('Got System Info');
     return data.data;
   }
 
@@ -121,14 +119,11 @@ class CapRover {
    * @returns App Info
    */
   async getAppInfo(appName: string) {
-    const result = await axiod.get(
-      this.buildURL(PATHS.APP_DATA) + `/${appName}`,
-      {
-        headers: this.headers,
-      },
-    );
+    const result = await axiod.get(this.buildURL(PATHS.APP_DATA) + `/${appName}`, {
+      headers: this.headers
+    });
     const data = validateResponse<AppInfo>(result);
-    debug("getAppInfo")("Got App Info about:", appName);
+    debug('getAppInfo')('Got App Info about:', appName);
     return data.data;
   }
 
@@ -138,10 +133,10 @@ class CapRover {
    */
   async listApps() {
     const result = await axiod.get(this.buildURL(PATHS.APP_LIST), {
-      headers: this.headers,
+      headers: this.headers
     });
     const data = validateResponse<AppList>(result);
-    debug("listApps")("Got", data.data.appDefinitions.length, "Apps");
+    debug('listApps')('Got', data.data.appDefinitions.length, 'Apps');
     return data.data;
   }
 
@@ -153,7 +148,7 @@ class CapRover {
   async getAppData(appName: string) {
     const result = await this.listApps();
     const app = result.appDefinitions.find((v) => v.appName === appName);
-    debug("getAppData")("Got App Data about:", app?.appName);
+    debug('getAppData')('Got App Data about:', app?.appName);
     return app;
   }
 
@@ -163,7 +158,7 @@ class CapRover {
    * @param timeout Timeout in seconds. Default: `60`
    */
   protected waitUntilAppReady(appName: string, timeout = 60): Promise<AppInfo> {
-    debug("waitUntilAppReady")("Waiting until", appName, "is ready");
+    debug('waitUntilAppReady')('Waiting until', appName, 'is ready');
     return new Promise((resolve, reject) => {
       let timeoutMS = timeout * 1000;
       const int = setInterval(async () => {
@@ -171,13 +166,13 @@ class CapRover {
         const result = await this.getAppInfo(appName);
         if (!result.isAppBuilding) {
           clearInterval(int);
-          debug("waitUntilAppReady")(appName, "is ready");
+          debug('waitUntilAppReady')(appName, 'is ready');
           return resolve(result);
         }
         if (timeoutMS <= 0) {
           clearInterval(int);
-          debug("waitUntilAppReady")("Exceeded timeout");
-          return reject("App building timeout exceeded");
+          debug('waitUntilAppReady')('Exceeded timeout');
+          return reject('App building timeout exceeded');
         }
       }, 1000);
     });
@@ -193,15 +188,15 @@ class CapRover {
   async createApp<T extends boolean = true>(
     appName: string,
     hasPersistentData = false,
-    waitForAppBuild?: T,
+    waitForAppBuild?: T
   ): Promise<AppCreate<T>> {
     const data = { appName, hasPersistentData };
     const params = { detached: 1 };
     const result = await axiod.post(this.buildURL(PATHS.APP_REGISTER), data, {
       headers: this.headers,
-      params,
+      params
     });
-    debug("createApp")("Created App", data);
+    debug('createApp')('Created App', data);
     if (waitForAppBuild) {
       const appInfo = await this.waitUntilAppReady(appName);
       return appInfo;
@@ -222,10 +217,10 @@ class CapRover {
       data.volumes = app?.volumes;
     }
     const result = await axiod.post(this.buildURL(PATHS.APP_DELETE), data, {
-      headers: this.headers,
+      headers: this.headers
     });
     const resultData = validateResponse<NoObj>(result);
-    debug("deleteApp")("Deleted App", data);
+    debug('deleteApp')('Deleted App', data);
     return resultData.data;
   }
 
@@ -245,12 +240,12 @@ class CapRover {
     }
     const data = validateResponse({
       status: 200,
-      statusText: "OK",
+      statusText: 'OK',
       data: {
         status: 100,
         description: `Deleted all Apps matching ${pattern.toString()}`,
-        data: {},
-      },
+        data: {}
+      }
     });
     return data.data;
   }
@@ -263,20 +258,11 @@ class CapRover {
    */
   async addDomain(appName: string, customDomain: string) {
     const data = { appName, customDomain };
-    const result = await axiod.post(
-      this.buildURL(PATHS.ADD_CUSTOM_DOMAIN),
-      data,
-      {
-        headers: this.headers,
-      },
-    );
+    const result = await axiod.post(this.buildURL(PATHS.ADD_CUSTOM_DOMAIN), data, {
+      headers: this.headers
+    });
     const resultData = validateResponse<NoObj>(result);
-    debug("addDomain")(
-      "Added Domain",
-      data.customDomain,
-      "to App",
-      data.appName,
-    );
+    debug('addDomain')('Added Domain', data.customDomain, 'to App', data.appName);
     return resultData.data;
   }
 
@@ -289,15 +275,10 @@ class CapRover {
   async enableSSL(appName: string, customDomain: string) {
     const data = { appName, customDomain };
     const result = await axiod.post(this.buildURL(PATHS.ENABLE_SSL), data, {
-      headers: this.headers,
+      headers: this.headers
     });
     const resultData = validateResponse<NoObj>(result);
-    debug("enableSSL")(
-      "Enabled SSL for",
-      data.customDomain,
-      "on App",
-      data.appName,
-    );
+    debug('enableSSL')('Enabled SSL for', data.customDomain, 'on App', data.appName);
     return resultData.data;
   }
 
@@ -309,10 +290,10 @@ class CapRover {
   protected async createBackup(postDownloadFileName: string) {
     const data = { postDownloadFileName };
     const result = await axiod.post(this.buildURL(PATHS.CREATE_BACKUP), data, {
-      headers: this.headers,
+      headers: this.headers
     });
     const resultData = validateResponse<BackupCreate>(result);
-    debug("createBackup")("Created Backup:", resultData.data.downloadToken);
+    debug('createBackup')('Created Backup:', resultData.data.downloadToken);
     return resultData.data;
   }
 
@@ -326,15 +307,15 @@ class CapRover {
     const params = { downloadToken, namespace: this.namespace };
     const result = await axiod.get(this.buildURL(PATHS.DOWNLOAD_BACKUP), {
       headers: this.headers,
-      params,
+      params
     });
     if (result.status === 200) {
       const data = new TextEncoder().encode(result.data);
       await Deno.writeFile(`./${fileName}`, data);
-      debug("downloadBackup")("Wrote Backup to", fileName);
+      debug('downloadBackup')('Wrote Backup to', fileName);
       return;
     } else {
-      throw new Error("Error downloading backup");
+      throw new Error('Error downloading backup');
     }
   }
 
@@ -346,9 +327,9 @@ class CapRover {
   async createAndDownloadBackup(fileName: string | null) {
     if (fileName === null) {
       const date = new Date();
-      fileName =
-        `${this.namespace}-bck-${date.getUTCFullYear()}-${date.getUTCMonth() +
-          1}-${date.getUTCDay()} ${date.getUTCHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}.rar`;
+      fileName = `${this.namespace}-bck-${date.getUTCFullYear()}-${
+        date.getUTCMonth() + 1
+      }-${date.getUTCDay()} ${date.getUTCHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}.rar`;
     }
     const backupData = await this.createBackup(fileName);
     const downloadToken = backupData.downloadToken;
@@ -373,10 +354,10 @@ class CapRover {
     const appPushWebhook = { repoInfo: options.repoInfo };
     const _data = { ...options, repoInfo: undefined, appPushWebhook };
     const result = await axiod.post(this.buildURL(PATHS.UPDATE_APP), _data, {
-      headers: this.headers,
+      headers: this.headers
     });
     const data = validateResponse<NoObj>(result);
-    debug("updateAppData")("Updated App", options.appName);
+    debug('updateAppData')('Updated App', options.appName);
     return data.data;
   }
 
@@ -388,9 +369,9 @@ class CapRover {
   protected async ensureBuildSuccess(appName: string) {
     const appInfo = await this.getAppInfo(appName);
     if (appInfo.isBuildFailed) {
-      throw new Error("Build failed");
+      throw new Error('Build failed');
     }
-    debug("ensureBuildSuccess")("Build for App", appName, "is not failed");
+    debug('ensureBuildSuccess')('Build for App', appName, 'is not failed');
     return appInfo;
   }
 
@@ -402,36 +383,28 @@ class CapRover {
    * @important The App must exist
    * @returns Empty Object
    */
-  async deployNow(
-    appName: string,
-    type: "dockerfile" | "dockerimage",
-    content: string | string[],
-  ) {
+  async deployNow(appName: string, type: 'dockerfile' | 'dockerimage', content: string | string[]) {
     const data = {
       captainDefinitionContent: JSON.stringify({
         schemaVersion: 2,
-        imageName: content,
+        imageName: content
       }),
-      gitHash: "",
+      gitHash: ''
     };
-    if (type === "dockerfile") {
+    if (type === 'dockerfile') {
       data.captainDefinitionContent = JSON.stringify({
         schemaVersion: 2,
-        dockerfileLines: content,
+        dockerfileLines: content
       });
     }
-    const result = await axiod.post(
-      this.buildURL(PATHS.APP_DATA) + `/${appName}`,
-      data,
-      {
-        headers: this.headers,
-      },
-    );
+    const result = await axiod.post(this.buildURL(PATHS.APP_DATA) + `/${appName}`, data, {
+      headers: this.headers
+    });
     const resultData = validateResponse(result);
     await this.waitUntilAppReady(appName);
     await this.delay(500);
     await this.ensureBuildSuccess(appName);
-    debug("deployNow")("Deployed", content, "on App", appName);
+    debug('deployNow')('Deployed', content, 'on App', appName);
     return resultData.data;
   }
 
@@ -444,10 +417,7 @@ class CapRover {
   }
 
   getLogsAsEvent(appName: string) {
-    return new (class
-      extends EventEmitter<
-        { log: (log: string) => Promise<unknown> | unknown }
-      > {
+    return new (class extends EventEmitter<{ log: (log: string) => Promise<unknown> | unknown }> {
       private alreadyLogged: string[] = [];
       constructor(public superThis: CapRover, appName: string) {
         super();
@@ -455,13 +425,13 @@ class CapRover {
       }
       private log(appName: string) {
         setInterval(async () => {
-          const log = await this.superThis.getAppLogs(appName, "hex");
+          const log = await this.superThis.getAppLogs(appName, 'hex');
           const processedLog = processLog(log.logs)
-            .split("\n")
+            .split('\n')
             .filter((v) => !this.alreadyLogged.includes(v));
           if (processedLog.length > 0) {
             this.alreadyLogged.push(...processedLog);
-            this.emit("log", processedLog.join("\n"));
+            this.emit('log', processedLog.join('\n'));
           }
         }, 200);
       }
@@ -480,44 +450,32 @@ class CapRover {
     oneClickAppName: string,
     capAppName: string,
     appVariables: Record<string, string>,
-    automated = true,
+    automated = true
   ) {
-    debug("resolveAppVariables")(
-      "Resolving",
-      appVariables,
-      "for",
-      oneClickAppName,
-    );
+    debug('resolveAppVariables')('Resolving', appVariables, 'for', oneClickAppName);
     // Check if One Click Apps exists
-    const oneClickAppsResult = await axiod.get(
-      this.buildURL(PATHS.ONECLICK_LIST),
-      {
-        headers: this.headers,
-      },
-    );
-    const oneClickApps =
-      validateResponse<OneClickAppsList>(oneClickAppsResult).data.oneClickApps;
-    const oneClickApp = oneClickApps.find((app) =>
-      app.name === oneClickAppName
-    );
+    const oneClickAppsResult = await axiod.get(this.buildURL(PATHS.ONECLICK_LIST), {
+      headers: this.headers
+    });
+    const oneClickApps = validateResponse<OneClickAppsList>(oneClickAppsResult).data.oneClickApps;
+    const oneClickApp = oneClickApps.find((app) => app.name === oneClickAppName);
     if (!oneClickApp) {
       throw new Error(`OneClick App ${oneClickAppName} not found`);
     }
 
     // Get raw YAML File
-    let rawAppData = (await axiod.get(this.appsPath + `${oneClickAppName}.yml`))
-      .data as string;
-    appVariables["$$cap_appname"] = capAppName;
-    appVariables["$$cap_root_domain"] = (await this.getSystemInfo()).rootDomain;
+    let rawAppData = (await axiod.get(this.appsPath + `${oneClickAppName}.yml`)).data as string;
+    appVariables['$$cap_appname'] = capAppName;
+    appVariables['$$cap_root_domain'] = (await this.getSystemInfo()).rootDomain;
     const appData = YAML.parse(rawAppData) as AppVariablesResolve;
     const variables = appData.caproverOneClickApp.variables;
     for (const variable of variables) {
-      let defaultValue = variable.defaultValue.toString() || "";
+      let defaultValue = variable.defaultValue.toString() || '';
       const regex = variable.validRegex?.match(/(\/?)(.+)\1([a-z]*)/i);
       if (regex === null) {
-        throw new Error("Invalid RegEx");
+        throw new Error('Invalid RegEx');
       }
-      const validRegex = new RegExp((regex && regex[2]) || ".*");
+      const validRegex = new RegExp((regex && regex[2]) || '.*');
       let value = appVariables[variable.id];
       const isRandomHex = defaultValue.match(/\$\$cap_gen_random_hex\((\d+)\)/);
       if (isRandomHex !== null) {
@@ -529,15 +487,13 @@ class CapRover {
           const result = await ask.prompt([
             {
               name: variable.id,
-              message: variable.label + " : " + (variable.description || ""),
+              message: variable.label + ' : ' + (variable.description || ''),
               validate: (v) => (v ? validRegex.test(v) : false),
-              default: defaultValue,
-            },
+              default: defaultValue
+            }
           ]);
           if (result[variable.id] != null) {
-            debug("resolveAppVariables")(
-              `${variable.id} : ${result[variable.id]}`,
-            );
+            debug('resolveAppVariables')(`${variable.id} : ${result[variable.id]}`);
             value = result[variable.id]!.toString();
           }
         }
@@ -562,15 +518,10 @@ class CapRover {
 
     // Replace Variables in YAML File with their correct value
     for (const [id, value] of Object.entries(appVariables)) {
-      debug("resolveAppVariables")(`${id} : ${value}`);
+      debug('resolveAppVariables')(`${id} : ${value}`);
       rawAppData = rawAppData.replaceAll(id, value);
     }
-    debug("resolveAppVariables")(
-      "Resolved",
-      appVariables,
-      "for",
-      oneClickAppName,
-    );
+    debug('resolveAppVariables')('Resolved', appVariables, 'for', oneClickAppName);
     // Return YAML File with correct variables
     return rawAppData;
   }
@@ -587,14 +538,14 @@ class CapRover {
     oneClickAppName: string,
     namespace: string,
     appVariables: Record<string, string>,
-    automated = true,
+    automated = true
   ) {
     const capAppName = `${namespace}-${oneClickAppName}`;
     const resolvedAppData = await this.resolveAppVariables(
       oneClickAppName,
       capAppName,
       appVariables,
-      automated,
+      automated
     );
     const appData = YAML.parse(resolvedAppData) as AppVariablesResolve;
     const services = appData.services;
@@ -602,7 +553,7 @@ class CapRover {
     const appsDeployed: string[] = [];
     do {
       for (const [serviceName, serviceData] of Object.entries(services)) {
-        debug("deployOneClickApp")("Deploying", serviceName);
+        debug('deployOneClickApp')('Deploying', serviceName);
         const dependsOn = serviceData.depends_on || [];
         // app already deployed
         if (appsDeployed.includes(serviceName)) {
@@ -614,13 +565,13 @@ class CapRover {
         }
         const hasPersistentData = !!serviceData.volumes;
         const volumes = (serviceData.volumes || []).map((v) => {
-          const splitted = v.split(":");
+          const splitted = v.split(':');
           const labelOrHost = splitted[0];
           const path = splitted[1];
-          if (labelOrHost.startsWith("/")) {
+          if (labelOrHost.startsWith('/')) {
             return {
               hostPath: labelOrHost,
-              containerPath: path,
+              containerPath: path
             };
           }
           return { volumeName: labelOrHost, containerPath: path };
@@ -628,16 +579,11 @@ class CapRover {
         const envVars =
           Object.entries(serviceData.environment || {}).map((v) => ({
             key: v[0],
-            value: v[1],
-          })) ||
-          [];
+            value: v[1]
+          })) || [];
         const caproverExtras = serviceData.caproverExtra || {};
-        const notExposeAsWebApp = caproverExtras.notExposeAsWebApp === "true"
-          ? true
-          : false;
-        const containerHttpPort = Number.parseInt(
-          caproverExtras.containerHttpPort || "80",
-        );
+        const notExposeAsWebApp = caproverExtras.notExposeAsWebApp === 'true' ? true : false;
+        const containerHttpPort = Number.parseInt(caproverExtras.containerHttpPort || '80');
 
         // create app
         await this.createApp(serviceName, hasPersistentData);
@@ -651,7 +597,7 @@ class CapRover {
           volumes,
           envVars,
           notExposeAsWebApp,
-          containerHttpPort,
+          containerHttpPort
         });
 
         const imageName = serviceData.image;
@@ -659,25 +605,25 @@ class CapRover {
 
         await this.deployNow(
           serviceName,
-          imageName ? "dockerimage" : "dockerfile",
-          imageName || dockerFileLines || "",
+          imageName ? 'dockerimage' : 'dockerfile',
+          imageName || dockerFileLines || ''
         );
 
         appsDeployed.push(serviceName);
 
-        debug("deployOneClickApp")("Deployed", serviceName);
+        debug('deployOneClickApp')('Deployed', serviceName);
       }
     } while (!arraysMatch(appsDeployed, appsToDeploy));
     const data = validateResponse({
       status: 200,
-      statusText: "OK",
+      statusText: 'OK',
       data: {
         status: 100,
         description: `Deployed all Apps in ${oneClickAppName}`,
-        data: {},
-      },
+        data: {}
+      }
     });
-    debug("deployOneClickApp")("Deployed One Click App", oneClickAppName);
+    debug('deployOneClickApp')('Deployed One Click App', oneClickAppName);
     return data;
   }
 
@@ -687,19 +633,13 @@ class CapRover {
    * @param encoding The Encoding
    * @returns Logs
    */
-  async getAppLogs(appName: string, encoding: AppLogsEncoding = "utf-8") {
+  async getAppLogs(appName: string, encoding: AppLogsEncoding = 'utf-8') {
     const result = await axiod.get(
       this.buildURL(PATHS.APP_DATA) + `/${appName}/logs?encoding=${encoding}`,
-      { headers: this.headers },
+      { headers: this.headers }
     );
     const data = validateResponse<AppLogs>(result);
-    debug("getAppLogs")(
-      "Got App Logs for",
-      appName,
-      "with",
-      encoding,
-      "Encoding",
-    );
+    debug('getAppLogs')('Got App Logs for', appName, 'with', encoding, 'Encoding');
     return data.data;
   }
 
@@ -709,17 +649,17 @@ class CapRover {
     address,
     password,
     protocol,
-    namespace = "captain",
+    namespace = 'captain'
   }: ICreate): Promise<CapRover> {
     const opts = { address, password, protocol, namespace };
-    debug("login")("Loggin in to", address);
+    debug('login')('Loggin in to', address);
     const loginHeaders = {
-      "content-type": "application/json;charset=UTF-8",
-      accept: "application/json, text/plain, */*",
-      "x-namespace": namespace,
+      'content-type': 'application/json;charset=UTF-8',
+      accept: 'application/json, text/plain, */*',
+      'x-namespace': namespace
     } as IHeaders;
     const token = await CapRover.getToken({ ...opts, headers: loginHeaders });
-    const headers = { ...loginHeaders, "X-Captain-Auth": token };
+    const headers = { ...loginHeaders, 'X-Captain-Auth': token };
     return new CapRover({ ...opts, token, headers });
   }
 }
@@ -749,31 +689,29 @@ export type Full<T> = {
 };
 
 export enum PROTOCOLS {
-  HTTP = "http://",
-  HTTPS = "https://",
+  HTTP = 'http://',
+  HTTPS = 'https://'
 }
 
-export type IUpdateAppData =
-  & Partial<
-    Omit<
-      AppDefinition,
-      | "appName"
-      | "deployedVersion"
-      | "hasDefaultSubDomainSsl"
-      | "isAppBuilding"
-      | "hasPersistentData"
-      | "networks"
-      | "versions"
-      | "appPushWebhook"
-    > & { repoInfo: RepoInfo }
-  >
-  & { appName: string };
+export type IUpdateAppData = Partial<
+  Omit<
+    AppDefinition,
+    | 'appName'
+    | 'deployedVersion'
+    | 'hasDefaultSubDomainSsl'
+    | 'isAppBuilding'
+    | 'hasPersistentData'
+    | 'networks'
+    | 'versions'
+    | 'appPushWebhook'
+  > & { repoInfo: RepoInfo }
+> & { appName: string };
 
 export interface IHeaders {
-  "content-type": string;
+  'content-type': string;
   accept: string;
-  "x-captain-auth": string;
-  "x-namespace": string;
+  'x-captain-auth': string;
+  'x-namespace': string;
 }
 
 export type NoObj = Record<string, never>;

@@ -1,41 +1,39 @@
-import { IAxiodResponse } from "https://deno.land/x/axiod@0.22/interfaces.ts";
-import { APIError } from "./error.ts";
-import debug from "https://deno.land/x/debuglog@v1.0.0/debug.ts";
+import { IAxiodResponse } from 'https://deno.land/x/axiod@0.22/interfaces.ts';
+import { APIError } from './error.ts';
+import debug from 'https://deno.land/x/debuglog@v1.0.0/debug.ts';
 
 /**
  * Validates the API Response
  * @param result The Result
  * @returns The Data
  */
-export function validateResponse<T = Obj>(
-  result: IValidateResponse,
-): IResult<T> {
-  debug("validateResponse")("Validating Response");
+export function validateResponse<T = Obj>(result: IValidateResponse): IResult<T> {
+  debug('validateResponse')('Validating Response');
   switch (result.data.status) {
     case STATUS.AUTHENTICATION_FAILED:
-      throw new APIError("Authentication failed", result.data);
+      throw new APIError('Authentication failed', result.data);
     case STATUS.AUTH_TOKEN_INVALID:
-      throw new APIError("Auth Token invalid", result.data);
+      throw new APIError('Auth Token invalid', result.data);
     case STATUS.BUILD_ERROR:
-      throw new APIError("Build Error", result.data);
+      throw new APIError('Build Error', result.data);
     case STATUS.ERROR_ALREADY_EXIST:
-      throw new APIError("Already exist", result.data);
+      throw new APIError('Already exist', result.data);
     case STATUS.ERROR_BAD_NAME:
-      throw new APIError("Bad name", result.data);
+      throw new APIError('Bad name', result.data);
     case STATUS.ERROR_CAPTAIN_NOT_INITIALIZED:
-      throw new APIError("Captain not initialized", result.data);
+      throw new APIError('Captain not initialized', result.data);
     case STATUS.ERROR_GENERIC:
-      throw new APIError("Generic", result.data);
+      throw new APIError('Generic', result.data);
     case STATUS.ERROR_NOT_AUTHORIZED:
-      throw new APIError("Not authorized", result.data);
+      throw new APIError('Not authorized', result.data);
     case STATUS.ERROR_USER_NOT_INITIALIZED:
-      throw new APIError("User not initialized", result.data);
+      throw new APIError('User not initialized', result.data);
     case STATUS.ILLEGAL_OPERATION:
-      throw new APIError("Illegal operation", result.data);
+      throw new APIError('Illegal operation', result.data);
     case STATUS.ILLEGAL_PARAMETER:
-      throw new APIError("Illegal parameter", result.data);
+      throw new APIError('Illegal parameter', result.data);
     case STATUS.NOT_FOUND:
-      throw new APIError("Not found", result.data);
+      throw new APIError('Not found', result.data);
     case STATUS.OK:
       return result.data as IResult<T>;
     case STATUS.OK_DEPLOY_STARTED:
@@ -43,17 +41,17 @@ export function validateResponse<T = Obj>(
     case STATUS.OK_PARTIALLY:
       return result.data as IResult<T>;
     case STATUS.PASSWORD_BACK_OFF:
-      throw new APIError("Password back off", result.data);
+      throw new APIError('Password back off', result.data);
     case STATUS.VERIFICATION_FAILED:
-      throw new APIError("Verification failed", result.data);
+      throw new APIError('Verification failed', result.data);
     case STATUS.WRONG_PASSWORD:
-      throw new APIError("Wrong password", result.data);
+      throw new APIError('Wrong password', result.data);
     default:
-      throw new APIError("Not a valid response!", result.data);
+      throw new APIError('Not a valid response!', result.data);
   }
 }
 
-interface IValidateResponse extends Omit<IAxiodResponse, "headers" | "config"> {
+interface IValidateResponse extends Omit<IAxiodResponse, 'headers' | 'config'> {
   data: IResult;
 }
 
@@ -75,23 +73,23 @@ export enum STATUS {
   ILLEGAL_PARAMETER = 1110,
   NOT_FOUND = 1111,
   AUTHENTICATION_FAILED = 1112,
-  PASSWORD_BACK_OFF = 1113,
+  PASSWORD_BACK_OFF = 1113
 }
 
 export enum PATHS {
-  LOGIN = "/login",
-  SYSTEM_INFO = "/user/system/info",
-  APP_LIST = "/user/apps/appDefinitions",
-  APP_REGISTER = "/user/apps/appDefinitions/register",
-  APP_DELETE = "/user/apps/appDefinitions/delete",
-  ADD_CUSTOM_DOMAIN = "/user/apps/appDefinitions/customdomain",
-  UPDATE_APP = "/user/apps/appDefinitions/update",
-  ENABLE_SSL = "/user/apps/appDefinitions/enablecustomdomainssl",
-  APP_DATA = "/user/apps/appData",
-  CREATE_BACKUP = "/user/system/createbackup",
-  DOWNLOAD_BACKUP = "/downloads/",
-  REPOSITORIES = "/user/oneclick/repositories/",
-  ONECLICK_LIST = "/user/oneclick/template/list",
+  LOGIN = '/login',
+  SYSTEM_INFO = '/user/system/info',
+  APP_LIST = '/user/apps/appDefinitions',
+  APP_REGISTER = '/user/apps/appDefinitions/register',
+  APP_DELETE = '/user/apps/appDefinitions/delete',
+  ADD_CUSTOM_DOMAIN = '/user/apps/appDefinitions/customdomain',
+  UPDATE_APP = '/user/apps/appDefinitions/update',
+  ENABLE_SSL = '/user/apps/appDefinitions/enablecustomdomainssl',
+  APP_DATA = '/user/apps/appData',
+  CREATE_BACKUP = '/user/system/createbackup',
+  DOWNLOAD_BACKUP = '/downloads/',
+  REPOSITORIES = '/user/oneclick/repositories/',
+  ONECLICK_LIST = '/user/oneclick/template/list'
 }
 
 export interface IResult<T = Obj> {
@@ -200,8 +198,10 @@ export interface Logs {
 }
 
 // Create App
-export type AppCreate<T extends boolean> = T extends true ? Promise<AppInfo>
-  : T extends false ? Promise<IAxiodResponse>
+export type AppCreate<T extends boolean> = T extends true
+  ? Promise<AppInfo>
+  : T extends false
+  ? Promise<IAxiodResponse>
   : never;
 
 // Delete App
@@ -266,17 +266,17 @@ export interface AppLogs {
 }
 
 export type AppLogsEncoding =
-  | "ascii"
-  | "utf8"
-  | "utf-8"
-  | "utf16le"
-  | "ucs2"
-  | "ucs-2"
-  | "base64"
-  | "base64url"
-  | "latin1"
-  | "binary"
-  | "hex";
+  | 'ascii'
+  | 'utf8'
+  | 'utf-8'
+  | 'utf16le'
+  | 'ucs2'
+  | 'ucs-2'
+  | 'base64'
+  | 'base64url'
+  | 'latin1'
+  | 'binary'
+  | 'hex';
 
 // One Click Apps List
 export interface OneClickAppsList {
