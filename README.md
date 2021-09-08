@@ -9,7 +9,7 @@
 ### 💻 First Start
 
 ```ts
-import CapRover, { PROTOCOLS } from 'https://deno.land/x/caproverapi@v1.0.1/mod.ts'
+import CapRover, { PROTOCOLS } from 'https://deno.land/x/caproverapi@v1.0.3/mod.ts'
 
 const capRover = await CapRover.login({
   address: '<your caprover instance>',
