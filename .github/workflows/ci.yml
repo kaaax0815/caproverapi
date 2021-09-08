@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v2
       - uses: actionsx/prettier@v2
         with:
-          args: --check **/*.ts
+          args: --check 'src/**/*.ts'
   test:
     name: Test
     needs: lint
