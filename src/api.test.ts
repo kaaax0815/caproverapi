@@ -55,9 +55,21 @@ Deno.test('validateResponse', () => {
     APIError
   );
   assertThrows<IResult<Obj>>(() => validateResponse(templateResponse(STATUS.NOT_FOUND)), APIError); */
-  assertEquals(() => validateResponse(templateResponse(STATUS.OK)), {});
-  assertEquals(() => validateResponse(templateResponse(STATUS.OK_DEPLOY_STARTED)), {});
-  assertEquals(() => validateResponse(templateResponse(STATUS.OK_PARTIALLY)), {});
+  assertEquals(validateResponse(templateResponse(STATUS.OK)), {
+    data: {},
+    description: 'Description',
+    status: 100
+  });
+  assertEquals(validateResponse(templateResponse(STATUS.OK_DEPLOY_STARTED)), {
+    data: {},
+    description: 'Description',
+    status: 101
+  });
+  assertEquals(validateResponse(templateResponse(STATUS.OK_PARTIALLY)), {
+    data: {},
+    description: 'Description',
+    status: 102
+  });
   /* assertThrows<IResult<Obj>>(
     () => validateResponse(templateResponse(STATUS.PASSWORD_BACK_OFF)),
     APIError
