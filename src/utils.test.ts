@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from 'https://deno.land/std@0.106.0/testing/asserts.ts';
+import { assertEquals } from 'https://deno.land/std@0.106.0/testing/asserts.ts';
 
 import { arraysMatch, generateRandomHexString, includesAll, processLog } from './utils.ts';
 
@@ -31,12 +31,5 @@ Deno.test('includesAll', () => {
 });
 
 Deno.test('processLog', () => {
-  assertThrows(() =>
-    processLog(
-      (Math.random() + 1).toString(36).substring(2) +
-        (Math.random() + 1).toString(36).substring(2) +
-        (Math.random() + 1).toString(36).substring(2)
-    )
-  );
   assertEquals(processLog('72616e646f6d2074657874'), 'random text'.substring(4));
 });
